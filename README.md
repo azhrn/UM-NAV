@@ -1,4 +1,4 @@
-# Faculty wayfinder
+# UM-NAV
 
 A mobile-first pilot for Block B, Floor 1. Open site/index.html in a browser to try it. No installation or build is required. The SVG is a schematic redrawn from the supplied senior’s map. Marker positions identify areas, and doors, distances and routes have not been surveyed.
 
