@@ -3,9 +3,11 @@ const viewport = el('viewport');
 let floor = floors[0];
 let active = null;
 let scale = 1;
+
 function normalize(value) {
   return value.toLowerCase().replace(/[^a-z0-9]/g, '');
 }
+
 function list(container, entries) {
   container.replaceChildren();
   for (const place of entries) {
@@ -16,6 +18,7 @@ function list(container, entries) {
     container.append(button);
   }
 }
+
 function renderFloor() {
   el('floor').textContent = floor.name;
   el('map').src = floor.map;
@@ -23,6 +26,7 @@ function renderFloor() {
   el('drawing').style.aspectRatio = floor.width + '/' + floor.height;
   list(el('directory'), places.filter(place => place.floor === floor.id));
 }
+
 function resize(next, target) {
   const oldWidth = el('drawing').offsetWidth || viewport.clientWidth;
   const cx = target ? target.x / floor.width : (viewport.scrollLeft + viewport.clientWidth / 2) / oldWidth;
@@ -34,6 +38,7 @@ function resize(next, target) {
   el('out').disabled = scale === 1;
   el('zoom').disabled = scale === 6;
 }
+
 function select(place) {
   active = place;
   floor = floors.find(item => item.id === place.floor);
@@ -53,23 +58,32 @@ function select(place) {
   document.activeElement.blur();
   el('floor').scrollIntoView({block:'nearest'});
 }
+
 el('search').oninput = event => {
   const query = normalize(event.target.value);
   const matches = query ? places.filter(p => [p.code,p.name].some(s => normalize(s).includes(query))) : [];
   list(el('results'), matches);
   if (query && !matches.length) el('results').textContent = 'No matching place. Try a shorter name or code.';
 };
+
 el('zoom').onclick = () => resize(scale * 1.5, active);
 el('out').onclick = () => resize(scale / 1.5, active);
 el('fit').onclick = () => resize(1);
 el('share').onclick = async () => {
-  try { await navigator.clipboard.writeText(location.href); el('share').textContent = 'Copied'; }
-  catch { window.prompt('Copy this room link', location.href); }
+  try {
+    await navigator.clipboard.writeText(location.href);
+    el('share').textContent = 'Copied';
+  } catch {
+    window.prompt('Copy this room link', location.href);
+  }
 };
 window.addEventListener('resize', () => resize(scale, active));
+
 renderFloor();
 resize(1);
 const requested = new URL(location.href).searchParams.get('room');
 const initial = places.find(place => place.id === requested);
 if (initial) select(initial);
-else if (requested) el('selected').textContent = 'Unknown room link. Search for your room above.';
+else if (requested) {
+  el('selected').textContent = 'Unknown room link. Search for your room above.';
+}
